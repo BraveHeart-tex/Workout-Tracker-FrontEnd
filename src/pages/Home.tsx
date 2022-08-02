@@ -1,4 +1,5 @@
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
+import { useWorkoutsContext } from '../hooks/useWorkoutsContext';
 
 // Interfaces
 import Workout from '../interfaces/Workout';
@@ -8,10 +9,12 @@ import WorkoutDetails from '../components/WorkoutDetails';
 import WorkoutForm from '../components/WorkoutForm';
 
 const Home = () => {
-  const [workouts, setWorkouts] = useState<Workout[] | null>(null);
+  const { workouts, dispatch } = useWorkoutsContext();
+  // const [workouts, setWorkouts] = useState<Workout[] | null>(null);
 
   useEffect(() => {
     fetchWorkouts();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const fetchWorkouts = async () => {
@@ -19,7 +22,7 @@ const Home = () => {
     const json = await response.json();
 
     if (response.ok) {
-      setWorkouts(json);
+      dispatch({ type: 'SET_WORKOUTS', payload: json });
     }
   };
 
