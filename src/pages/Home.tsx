@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
 import { useWorkoutsContext } from '../hooks/useWorkoutsContext';
+import { useAuthContext } from '../hooks/useAuthContext';
 
 // Interfaces
 import Workout from '../interfaces/Workout';
@@ -10,21 +11,25 @@ import WorkoutForm from '../components/WorkoutForm';
 
 const Home = () => {
   const { workouts, dispatch } = useWorkoutsContext();
-  // const [workouts, setWorkouts] = useState<Workout[] | null>(null);
+  const { user } = useAuthContext();
 
   useEffect(() => {
-    fetchWorkouts();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+    const fetchWorkouts = async () => {
+      const response = await fetch('/api/workouts', {
+        headers: {
+          Authorization: `Bearer ${user.token}`,
+        },
+      });
+      const json = await response.json();
 
-  const fetchWorkouts = async () => {
-    const response = await fetch('/api/workouts');
-    const json = await response.json();
-
-    if (response.ok) {
-      dispatch({ type: 'SET_WORKOUTS', payload: json });
+      if (response.ok) {
+        dispatch({ type: 'SET_WORKOUTS', payload: json });
+      }
+    };
+    if (user) {
+      fetchWorkouts();
     }
-  };
+  }, [dispatch, user]);
 
   return (
     <div className='home'>
